@@ -16,9 +16,9 @@ cmake_minimum_required(VERSION 3.15)
 
 project(LEARNING_BIQUAD VERSION 0.0.1)
 
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_CXX_STANDARD 17)
 
 # If you've installed JUCE somehow (via a package manager, or directly using the CMake install
 # target), you'll need to tell this project that it depends on the installed copy of JUCE. If you've
@@ -32,7 +32,7 @@ find_package(JUCE CONFIG REQUIRED)        # If you've installed JUCE to your sys
 # If you are building a VST2 or AAX plugin, CMake needs to be told where to find these SDKs on your
 # system. This setup should be done before calling `juce_add_plugin`.
 
-# juce_set_vst2_sdk_path("/Users/luizacarvalho/SDKs/VST_SDK")
+# juce_set_vst2_sdk_path(...)
 # juce_set_aax_sdk_path(...)
 
 # `juce_add_plugin` adds a static library target with the name passed as the first argument
