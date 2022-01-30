@@ -28,27 +28,27 @@ public:
 
     //==============================================================================
     juce::AudioProcessorEditor* createEditor() override;
-    bool hasEditor() const override;
+    bool hasEditor() const override { return true; }
 
     //==============================================================================
-    const juce::String getName() const override;
+    const juce::String getName() const override { return "Learning Biquad"; }
 
-    bool acceptsMidi() const override;
-    bool producesMidi() const override;
-    bool isMidiEffect() const override;
-    double getTailLengthSeconds() const override;
+    bool acceptsMidi() const override { return false; }
+    bool producesMidi() const override { return false; }
+    double getTailLengthSeconds() const override { return 0.0; }
 
     //==============================================================================
-    int getNumPrograms() override;
-    int getCurrentProgram() override;
-    void setCurrentProgram (int index) override;
-    const juce::String getProgramName (int index) override;
-    void changeProgramName (int index, const juce::String& newName) override;
+    int getNumPrograms() override { return 1; }
+    int getCurrentProgram() override { return 0; }
+    void setCurrentProgram (int index) override { juce::ignoreUnused(index); }
+    const juce::String getProgramName (int index) override { { juce::ignoreUnused(index); return {}; }}
+    void changeProgramName (int index, const juce::String& newName) override { juce::ignoreUnused (index, newName);}
 
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
+    // coefficients
     float m_a0;
     float m_a1;
     float m_a2;
@@ -56,12 +56,13 @@ public:
     float m_b2;
     
     // formulas
-    Coefficients calculateHPF();
-    Coefficients calculateBPF();
+    Coefficients calculateHPF(double frequency);
+    Coefficients calculateBPF(double frequency);
     Coefficients calculateLPF(double frequency);
 
 private:
     //==============================================================================
+    // TODO: change to allow more channels? juce::Array??
     float m_z_1_a[2];
     float m_z_2_a[2];
     float m_z_1_b[2];

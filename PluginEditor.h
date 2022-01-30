@@ -40,9 +40,12 @@ private:
     juce::Label m_freqLabel{"freq_label", "Frequency"};
     
     // buttons
-    // juce::TextButton m_hpfButton;
-    // juce::TextButton m_bpfButton;
+    juce::TextButton m_hpfButton{"HPF"};
+    juce::TextButton m_bpfButton{"BPF"};
     juce::TextButton m_lpfButton{"LPF"};
+    
+    // functions
+    void updateCoefficients(Coefficients coefs);
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LearningBiquadAudioProcessorEditor)

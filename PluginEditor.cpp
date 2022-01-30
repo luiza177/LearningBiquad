@@ -43,14 +43,23 @@ LearningBiquadAudioProcessorEditor::LearningBiquadAudioProcessorEditor (Learning
     m_lpfButton.onClick = [this]()
     { 
         auto coefs = processorRef.calculateLPF(m_freqSlider.getValue()); 
-        m_a0_slider.setValue(coefs.a0);
-        m_a1_slider.setValue(coefs.a1);
-        m_a2_slider.setValue(coefs.a2);
-        m_b1_slider.setValue(coefs.b1);
-        m_b2_slider.setValue(coefs.b2);
+        updateCoefficients(coefs);
     };
     
-    // m_freqSlider.setSliderStyle(juce::Slider::SliderStyle::LinearHorizontal);
+    addAndMakeVisible(&m_hpfButton);
+    m_hpfButton.onClick = [this]()
+    { 
+        auto coefs = processorRef.calculateHPF(m_freqSlider.getValue()); 
+        updateCoefficients(coefs);
+    };
+    
+    addAndMakeVisible(&m_bpfButton);
+    m_bpfButton.onClick = [this]()
+    { 
+        auto coefs = processorRef.calculateBPF(m_freqSlider.getValue()); 
+        updateCoefficients(coefs);
+    };
+    
     m_freqSlider.setRange(20.0, 20000.0);
     m_freqSlider.setNumDecimalPlacesToDisplay(0);
     m_freqSlider.setTextBoxIsEditable(true);
@@ -86,14 +95,12 @@ void LearningBiquadAudioProcessorEditor::resized()
     auto freqArea = buttonArea.removeFromTop(70); //TODO: remove magic numbers
     
     auto labelWidth = static_cast<int>(labelArea.getWidth()/5);
-    auto sliderWidth = static_cast<int>(bounds.getWidth()/5);
-    auto buttonWidth = static_cast<int>(buttonArea.getWidth()/3);
-
     for (auto* label : getCoefficientLabels())
     {
         label->setBounds(labelArea.removeFromLeft(labelWidth));
     }
     
+    auto sliderWidth = static_cast<int>(bounds.getWidth()/5);
     for (auto* slider : getCoefficientSliders())
     {
         slider->setBounds(bounds.removeFromLeft(sliderWidth));
@@ -101,6 +108,10 @@ void LearningBiquadAudioProcessorEditor::resized()
     
     m_freqLabel.setBounds(freqArea.removeFromLeft(100)); // TODO: find text width etc
     m_freqSlider.setBounds(freqArea);
+    
+    auto buttonWidth = static_cast<int>(buttonArea.getWidth()/3);
+    m_hpfButton.setBounds(buttonArea.removeFromLeft(buttonWidth));
+    m_bpfButton.setBounds(buttonArea.removeFromLeft(buttonWidth));
     m_lpfButton.setBounds(buttonArea.removeFromLeft(buttonWidth));
 }
 
@@ -124,4 +135,13 @@ std::vector<juce::Label*> LearningBiquadAudioProcessorEditor::getCoefficientLabe
         &m_b1_label,
         &m_b2_label
     };
+}
+
+void LearningBiquadAudioProcessorEditor::updateCoefficients(Coefficients coefs)
+{
+    m_a0_slider.setValue(coefs.a0);
+    m_a1_slider.setValue(coefs.a1);
+    m_a2_slider.setValue(coefs.a2);
+    m_b1_slider.setValue(coefs.b1);
+    m_b2_slider.setValue(coefs.b2);
 }

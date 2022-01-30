@@ -18,69 +18,69 @@ LearningBiquadAudioProcessor::~LearningBiquadAudioProcessor()
 }
 
 //==============================================================================
-const juce::String LearningBiquadAudioProcessor::getName() const
-{
-    return "Learning Biquad";
-}
+// const juce::String LearningBiquadAudioProcessor::getName() const
+// {
+//     return "Learning Biquad";
+// }
 
-bool LearningBiquadAudioProcessor::acceptsMidi() const
-{
-   #if JucePlugin_WantsMidiInput
-    return true;
-   #else
-    return false;
-   #endif
-}
+// bool LearningBiquadAudioProcessor::acceptsMidi() const
+// {
+//    #if JucePlugin_WantsMidiInput
+//     return true;
+//    #else
+//     return false;
+//    #endif
+// }
 
-bool LearningBiquadAudioProcessor::producesMidi() const
-{
-   #if JucePlugin_ProducesMidiOutput
-    return true;
-   #else
-    return false;
-   #endif
-}
+// bool LearningBiquadAudioProcessor::producesMidi() const
+// {
+//    #if JucePlugin_ProducesMidiOutput
+//     return true;
+//    #else
+//     return false;
+//    #endif
+// }
 
-bool LearningBiquadAudioProcessor::isMidiEffect() const
-{
-   #if JucePlugin_IsMidiEffect
-    return true;
-   #else
-    return false;
-   #endif
-}
+// bool LearningBiquadAudioProcessor::isMidiEffect() const
+// {
+//    #if JucePlugin_IsMidiEffect
+//     return true;
+//    #else
+//     return false;
+//    #endif
+// }
 
-double LearningBiquadAudioProcessor::getTailLengthSeconds() const
-{
-    return 0.0;
-}
+// double LearningBiquadAudioProcessor::getTailLengthSeconds() const
+// {
+//     return 0.0;
+// }
 
-int LearningBiquadAudioProcessor::getNumPrograms()
-{
-    return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
-                // so this should be at least 1, even if you're not really implementing programs.
-}
+// int LearningBiquadAudioProcessor::getNumPrograms()
+// {
+//     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
+//                 // so this should be at least 1, even if you're not really implementing programs.
+// }
 
-int LearningBiquadAudioProcessor::getCurrentProgram()
-{
-    return 0;
-}
+// int LearningBiquadAudioProcessor::getCurrentProgram()
+// {
+//     return 0;
+// }
 
-void LearningBiquadAudioProcessor::setCurrentProgram (int index)
-{
-    juce::ignoreUnused (index);
-}
+// void LearningBiquadAudioProcessor::setCurrentProgram (int index)
+// {
+//     juce::ignoreUnused (index);
+// }
 
-const juce::String LearningBiquadAudioProcessor::getProgramName (int index)
-{
-    juce::ignoreUnused (index);
-    return {};
-}
+// const juce::String LearningBiquadAudioProcessor::getProgramName (int index)
+// {
+//     juce::ignoreUnused (index);
+//     return {};
+// }
 
-void LearningBiquadAudioProcessor::changeProgramName (int index, const juce::String& newName)
-{
-    juce::ignoreUnused (index, newName);
-}
+// void LearningBiquadAudioProcessor::changeProgramName (int index, const juce::String& newName)
+// {
+//     juce::ignoreUnused (index, newName);
+// }
 
 //==============================================================================
 void LearningBiquadAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -166,10 +166,10 @@ void LearningBiquadAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
 }
 
 //==============================================================================
-bool LearningBiquadAudioProcessor::hasEditor() const
-{
-    return true; // (change this to false if you choose to not supply an editor)
-}
+// bool LearningBiquadAudioProcessor::hasEditor() const
+// {
+//     return true; // (change this to false if you choose to not supply an editor)
+// }
 
 juce::AudioProcessorEditor* LearningBiquadAudioProcessor::createEditor()
 {
@@ -231,4 +231,45 @@ Coefficients LearningBiquadAudioProcessor::calculateLPF(double frequency)
     m_b2 = static_cast<float>(lpf.b2);
     
     return lpf;
+}
+
+Coefficients LearningBiquadAudioProcessor::calculateHPF(double frequency)
+{
+    Coefficients hpf;
+    auto omega = juce::MathConstants<double>::twoPi * (frequency / getSampleRate());
+    auto sin_omega = std::sin(omega);
+    auto cos_omega = std::cos(omega);
+    
+    auto gamma = cos_omega / (1.f + sin_omega);
+    hpf.a0 = (1.f + gamma) / 2.f;
+    hpf.a1 = -1.f * hpf.a0;
+    hpf.a2 = 0.f;
+    hpf.b1 = -1.f * gamma;
+    hpf.b2 = 0.f;
+    
+    m_a0 = static_cast<float>(hpf.a0);
+    m_a1 = static_cast<float>(hpf.a1);
+    m_a2 = static_cast<float>(hpf.a2);
+    m_b1 = static_cast<float>(hpf.b1);
+    m_b2 = static_cast<float>(hpf.b2);
+    
+    return hpf;
+}
+
+Coefficients LearningBiquadAudioProcessor::calculateBPF(double frequency)
+{
+    Coefficients bpf;
+    auto omega = juce::MathConstants<double>::twoPi * (frequency / getSampleRate());
+    auto sin_omega = std::sin(omega);
+    auto cos_omega = std::cos(omega);
+    
+    bpf.a0 = 1.0; // RESET
+    
+    m_a0 = static_cast<float>(bpf.a0);
+    m_a1 = static_cast<float>(bpf.a1);
+    m_a2 = static_cast<float>(bpf.a2);
+    m_b1 = static_cast<float>(bpf.b1);
+    m_b2 = static_cast<float>(bpf.b2);
+    
+    return bpf;
 }
