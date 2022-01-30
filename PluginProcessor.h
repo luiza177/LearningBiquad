@@ -59,6 +59,15 @@ public:
     Coefficients calculateHPF(double frequency);
     Coefficients calculateBPF(double frequency);
     Coefficients calculateLPF(double frequency);
+    
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    
+    juce::AudioProcessorValueTreeState m_apvts {
+        *this, 
+        nullptr, 
+        juce::Identifier("Parameters"), 
+        createParameterLayout()
+    };
 
 private:
     //==============================================================================

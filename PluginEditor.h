@@ -36,8 +36,17 @@ private:
     juce::Label m_b2_label{"b2_label", "b2"};
     
     // frequency slider
-    juce::Slider m_freqSlider{juce::Slider::SliderStyle::LinearHorizontal, juce::Slider::TextBoxRight};
-    juce::Label m_freqLabel{"freq_label", "Frequency"};
+    juce::Slider m_freq_slider{juce::Slider::SliderStyle::LinearHorizontal, juce::Slider::TextBoxRight};
+    juce::Label m_freq_label{"freq_label", "Frequency"};
+    
+    // attachments
+    using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
+    SliderAttachment m_a0_sliderAttachment;
+    SliderAttachment m_a1_sliderAttachment;
+    SliderAttachment m_a2_sliderAttachment;
+    SliderAttachment m_b1_sliderAttachment;
+    SliderAttachment m_b2_sliderAttachment;
+    SliderAttachment m_frequency_sliderAttachment;
     
     // buttons
     juce::TextButton m_hpfButton{"HPF"};

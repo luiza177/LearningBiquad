@@ -2,7 +2,13 @@
 
 //==============================================================================
 LearningBiquadAudioProcessorEditor::LearningBiquadAudioProcessorEditor (LearningBiquadAudioProcessor& p)
-    : AudioProcessorEditor (&p), processorRef (p)
+    : AudioProcessorEditor (&p), processorRef (p),
+    m_a0_sliderAttachment(processorRef.m_apvts, "a0", m_a0_slider),
+    m_a1_sliderAttachment(processorRef.m_apvts, "a1", m_a1_slider),
+    m_a2_sliderAttachment(processorRef.m_apvts, "a2", m_a2_slider),
+    m_b1_sliderAttachment(processorRef.m_apvts, "b1", m_b1_slider),
+    m_b2_sliderAttachment(processorRef.m_apvts, "b2", m_b2_slider),
+    m_frequency_sliderAttachment(processorRef.m_apvts, "frequency", m_freq_slider)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -13,9 +19,9 @@ LearningBiquadAudioProcessorEditor::LearningBiquadAudioProcessorEditor (Learning
     for (auto* slider : getCoefficientSliders())
     {
         slider->setSliderStyle(juce::Slider::LinearVertical);
-        slider->setRange(-1.0, 1.0, 0.0);
+        // slider->setRange(-1.0, 1.0, 0.0);
         slider->setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 20);
-        slider->setValue(0.0);
+        // slider->setValue(0.0);
         slider->setNumDecimalPlacesToDisplay(2);
         slider->setDoubleClickReturnValue(true, 0.0);
         addAndMakeVisible(slider);
@@ -42,35 +48,35 @@ LearningBiquadAudioProcessorEditor::LearningBiquadAudioProcessorEditor (Learning
     addAndMakeVisible(&m_lpfButton);
     m_lpfButton.onClick = [this]()
     { 
-        auto coefs = processorRef.calculateLPF(m_freqSlider.getValue()); 
+        auto coefs = processorRef.calculateLPF(m_freq_slider.getValue()); 
         updateCoefficients(coefs);
     };
     
     addAndMakeVisible(&m_hpfButton);
     m_hpfButton.onClick = [this]()
     { 
-        auto coefs = processorRef.calculateHPF(m_freqSlider.getValue()); 
+        auto coefs = processorRef.calculateHPF(m_freq_slider.getValue()); 
         updateCoefficients(coefs);
     };
     
     addAndMakeVisible(&m_bpfButton);
     m_bpfButton.onClick = [this]()
     { 
-        auto coefs = processorRef.calculateBPF(m_freqSlider.getValue()); 
+        auto coefs = processorRef.calculateBPF(m_freq_slider.getValue()); 
         updateCoefficients(coefs);
     };
     
-    m_freqSlider.setRange(20.0, 20000.0);
-    m_freqSlider.setNumDecimalPlacesToDisplay(0);
-    m_freqSlider.setTextBoxIsEditable(true);
-    m_freqSlider.setValue(1000.0);
-    m_freqSlider.setDoubleClickReturnValue(true, 1000.0);
-    m_freqSlider.setSkewFactorFromMidPoint(2000.0);
-    m_freqSlider.setTextValueSuffix("Hz");
-    addAndMakeVisible(&m_freqSlider);
+    // m_freq_slider.setRange(20.0, 20000.0);
+    // m_freq_slider.setNumDecimalPlacesToDisplay(0);
+    // m_freq_slider.setTextBoxIsEditable(true);
+    // m_freq_slider.setValue(1000.0);
+    m_freq_slider.setDoubleClickReturnValue(true, 1000.0);
+    // m_freq_slider.setSkewFactorFromMidPoint(2000.0);
+    // m_freq_slider.setTextValueSuffix("Hz");
+    addAndMakeVisible(&m_freq_slider);
     
-    m_freqLabel.setJustificationType(juce::Justification::horizontallyCentred);
-    addAndMakeVisible(&m_freqLabel);
+    m_freq_label.setJustificationType(juce::Justification::horizontallyCentred);
+    addAndMakeVisible(&m_freq_label);
 }
 
 LearningBiquadAudioProcessorEditor::~LearningBiquadAudioProcessorEditor()
@@ -106,8 +112,8 @@ void LearningBiquadAudioProcessorEditor::resized()
         slider->setBounds(bounds.removeFromLeft(sliderWidth));
     }
     
-    m_freqLabel.setBounds(freqArea.removeFromLeft(100)); // TODO: find text width etc
-    m_freqSlider.setBounds(freqArea);
+    m_freq_label.setBounds(freqArea.removeFromLeft(100)); // TODO: find text width etc
+    m_freq_slider.setBounds(freqArea);
     
     auto buttonWidth = static_cast<int>(buttonArea.getWidth()/3);
     m_hpfButton.setBounds(buttonArea.removeFromLeft(buttonWidth));

@@ -182,14 +182,20 @@ void LearningBiquadAudioProcessor::getStateInformation (juce::MemoryBlock& destD
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
-    juce::ignoreUnused (destData);
+    juce::MemoryOutputStream mos(destData, true); //append to existing block content
+    m_apvts.state.writeToStream(mos);
 }
 
 void LearningBiquadAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
-    juce::ignoreUnused (data, sizeInBytes);
+    auto tree = juce::ValueTree::readFromData(data, static_cast<size_t>(sizeInBytes));
+    if (tree.isValid())
+    {
+        m_apvts.replaceState(tree);
+        //? updateCoefficients();
+    }
 }
 
 //==============================================================================
@@ -197,6 +203,60 @@ void LearningBiquadAudioProcessor::setStateInformation (const void* data, int si
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new LearningBiquadAudioProcessor();
+}
+
+//==============================================================================
+juce::AudioProcessorValueTreeState::ParameterLayout LearningBiquadAudioProcessor::createParameterLayout()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "a0", // param id
+        "a0", // param name
+        -1.f, // min
+        1.f,  // max
+        1.0   // default
+    ));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "a1", // param id
+        "a1", // param name
+        -1.f, // min
+        1.f,  // max
+        0.0   // default
+    ));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "a2", // param id
+        "a2", // param name
+        -1.f, // min
+        1.f,  // max
+        0.0   // default
+    ));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "b1", // param id
+        "b1", // param name
+        -1.f, // min
+        1.f,  // max
+        0.0   // default
+    ));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "b2", // param id
+        "b2", // param name
+        -1.f, // min
+        1.f,  // max
+        0.0   // default
+    ));
+    layout.add(std::make_unique<juce::AudioParameterFloat>(
+        "frequency", 
+        "Frequency", 
+        juce::NormalisableRange<float>(20.f, 20000.f, 0.f, 0.30f), // min, max, step, skew
+        1000.f,
+        juce::String(),
+        juce::AudioProcessorParameter::genericParameter,
+        [](float value, int){ return juce::String(value, 1, false) + juce::String(" Hz"); }, //TODO: add kHz??
+        [](const juce::String& text){ return text.getFloatValue(); }
+    ));
+    
+    return layout;
 }
 
 //==============================================================================
