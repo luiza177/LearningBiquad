@@ -89,14 +89,14 @@ void LearningBiquadAudioProcessor::prepareToPlay (double sampleRate, int samples
     // initialisation that you need..
     juce::ignoreUnused (sampleRate, samplesPerBlock);
 
-    m_f_z_1_in[0] = 0.f;
-    m_f_z_2_in[0] = 0.f;
-    m_f_z_1_out[0] = 0.f;
-    m_f_z_2_out[0] = 0.f;
-    m_f_z_1_in[1] = 0.f;
-    m_f_z_2_in[1] = 0.f;
-    m_f_z_1_out[1] = 0.f;
-    m_f_z_2_out[1] = 0.f;
+    m_z_1_a[0] = 0.f;
+    m_z_2_a[0] = 0.f;
+    m_z_1_b[0] = 0.f;
+    m_z_2_b[0] = 0.f;
+    m_z_1_a[1] = 0.f;
+    m_z_2_a[1] = 0.f;
+    m_z_1_b[1] = 0.f;
+    m_z_2_b[1] = 0.f;
 }
 
 void LearningBiquadAudioProcessor::releaseResources()
@@ -151,15 +151,15 @@ void LearningBiquadAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
         // juce::ignoreUnused (channelData);
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
             auto xn = channelData[sample];
-            auto xn_1 = m_f_z_1_in[channel];
-            auto xn_2 = m_f_z_2_in[channel];
-            auto yn_1 = m_f_z_1_out[channel];
-            auto yn_2 = m_f_z_2_out[channel];
-            auto yn = m_f_a0 * xn + m_f_a1 * xn_1 + m_f_a2 * xn_2 - m_f_b1 * yn_1 - m_f_b2 * yn_2;
-            m_f_z_2_in[channel] = xn_1;
-            m_f_z_2_out[channel] = yn_1;
-            m_f_z_1_in[channel] = xn;
-            m_f_z_1_out[channel] = yn;
+            auto xn_1 = m_z_1_a[channel];
+            auto xn_2 = m_z_2_a[channel];
+            auto yn_1 = m_z_1_b[channel];
+            auto yn_2 = m_z_2_b[channel];
+            auto yn = m_a0 * xn + m_a1 * xn_1 + m_a2 * xn_2 - m_b1 * yn_1 - m_b2 * yn_2;
+            m_z_2_a[channel] = xn_1;
+            m_z_2_b[channel] = yn_1;
+            m_z_1_a[channel] = xn;
+            m_z_1_b[channel] = yn;
             channelData[sample] = yn;
         }
     }
@@ -197,4 +197,38 @@ void LearningBiquadAudioProcessor::setStateInformation (const void* data, int si
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new LearningBiquadAudioProcessor();
+}
+
+//==============================================================================
+Coefficients LearningBiquadAudioProcessor::calculateLPF(double frequency)
+{
+    Coefficients lpf;
+    auto omega = juce::MathConstants<double>::twoPi * (frequency / getSampleRate());
+    auto sin_omega = std::sin(omega);
+    auto cos_omega = std::cos(omega);
+    
+    //? https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwiMo5bKkdn1AhWoiv0HHSMZBRQQFnoECCQQAQ&url=https%3A%2F%2Fe2e.ti.com%2Fcfs-file%2F__key%2Fcommunityserver-discussions-components-files%2F6%2FConfigure-the-Coefficients-for-Digital-Biquad-Filters-in-TLV320AIc3xxx-F_2E00__2E00__2E00_.pdf&usg=AOvVaw1xITX6wqSZTOUlkMWoiDEf
+    // auto alpha = sin_omega / 2.f;
+    // lpf.a0 = 1 + alpha;
+    // lpf.a1 = -2.f * cos_omega;
+    // lpf.a2 = 1.f - alpha;
+    // auto b0 = (1.f - cos_omega) / 2.f; //?
+    // lpf.b1 = 1.f - cos_omega;
+    // lpf.b2 = (1.f - cos_omega) / 2.f;
+    
+    //? compare to:
+    auto gamma = cos_omega / (1.f + sin_omega);
+    lpf.a0 = (1.f - gamma) / 2.f;
+    lpf.a1 = lpf.a0;
+    lpf.a2 = 0.f;
+    lpf.b1 = -1.f * gamma;
+    lpf.b2 = 0.f;
+    
+    m_a0 = static_cast<float>(lpf.a0);
+    m_a1 = static_cast<float>(lpf.a1);
+    m_a2 = static_cast<float>(lpf.a2);
+    m_b1 = static_cast<float>(lpf.b1);
+    m_b2 = static_cast<float>(lpf.b2);
+    
+    return lpf;
 }
