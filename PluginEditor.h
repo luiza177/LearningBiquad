@@ -39,6 +39,9 @@ private:
     juce::Slider m_freq_slider{juce::Slider::SliderStyle::LinearHorizontal, juce::Slider::TextBoxRight};
     juce::Label m_freq_label{"freq_label", "Frequency"};
     
+    // order button
+    juce::TextButton m_filterOrder_button{"1st Order"};
+    
     // attachments
     using SliderAttachment = juce::AudioProcessorValueTreeState::SliderAttachment;
     SliderAttachment m_a0_sliderAttachment;
@@ -48,6 +51,9 @@ private:
     SliderAttachment m_b2_sliderAttachment;
     SliderAttachment m_frequency_sliderAttachment;
     
+    using ButtonAttachment = juce::AudioProcessorValueTreeState::ButtonAttachment;
+    ButtonAttachment m_filterOrder_buttonAttachment;
+    
     // buttons
     juce::TextButton m_hpfButton{"HPF"};
     juce::TextButton m_bpfButton{"BPF"};
@@ -55,6 +61,7 @@ private:
     
     // functions
     void updateCoefficients(Coefficients coefs);
+    void setFilterOrderState();
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LearningBiquadAudioProcessorEditor)

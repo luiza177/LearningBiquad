@@ -213,37 +213,52 @@ juce::AudioProcessorValueTreeState::ParameterLayout LearningBiquadAudioProcessor
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "a0", // param id
         "a0", // param name
-        -1.f, // min
-        1.f,  // max
-        1.0   // default
+        juce::NormalisableRange<float>(-1.f, 1.f, 0.f, 1.f), // min, max, step, skew
+        1.0,   // default
+        juce::String(), // parameter label
+        juce::AudioProcessorParameter::genericParameter, // parameter category
+        [](float value, int){ return juce::String(value, 3, false); },
+        [](const juce::String& text){ return text.getFloatValue(); }
     ));
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "a1", // param id
         "a1", // param name
-        -1.f, // min
-        1.f,  // max
-        0.0   // default
+        juce::NormalisableRange<float>(-1.f, 1.f, 0.f, 1.f), // min, max, step, skew
+        0.0,   // default
+        juce::String(), // parameter label
+        juce::AudioProcessorParameter::genericParameter, // parameter category
+        [](float value, int){ return juce::String(value, 3, false); },
+        [](const juce::String& text){ return text.getFloatValue(); }
     ));
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "a2", // param id
         "a2", // param name
-        -1.f, // min
-        1.f,  // max
-        0.0   // default
+        juce::NormalisableRange<float>(-1.f, 1.f, 0.f, 1.f), // min, max, step, skew
+        0.0,   // default
+        juce::String(), // parameter label
+        juce::AudioProcessorParameter::genericParameter, // parameter category
+        [](float value, int){ return juce::String(value, 3, false); },
+        [](const juce::String& text){ return text.getFloatValue(); }
     ));
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "b1", // param id
         "b1", // param name
-        -1.f, // min
-        1.f,  // max
-        0.0   // default
+        juce::NormalisableRange<float>(-1.f, 1.f, 0.f, 1.f), // min, max, step, skew
+        0.0,   // default
+        juce::String(), // parameter label
+        juce::AudioProcessorParameter::genericParameter, // parameter category
+        [](float value, int){ return juce::String(value, 3, false); },
+        [](const juce::String& text){ return text.getFloatValue(); }
     ));
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "b2", // param id
         "b2", // param name
-        -1.f, // min
-        1.f,  // max
-        0.0   // default
+        juce::NormalisableRange<float>(-1.f, 1.f, 0.f, 1.f), // min, max, step, skew
+        0.0,   // default
+        juce::String(), // parameter label
+        juce::AudioProcessorParameter::genericParameter, // parameter category
+        [](float value, int){ return juce::String(value, 3, false); },
+        [](const juce::String& text){ return text.getFloatValue(); }
     ));
     layout.add(std::make_unique<juce::AudioParameterFloat>(
         "frequency", 
@@ -256,6 +271,19 @@ juce::AudioProcessorValueTreeState::ParameterLayout LearningBiquadAudioProcessor
         [](const juce::String& text){ return text.getFloatValue(); }
     ));
     
+    // juce::StringArray filterOrder = {"1st Order", "2nd Order"};
+    // layout.add(std::make_unique<juce::AudioParameterChoice>(
+    //     "filterOrder",
+    //     "Filter Order",
+    //     filterOrder,
+    //     0
+    // ));
+    
+    layout.add(std::make_unique<juce::AudioParameterBool>(
+        "filterOrder",
+        "Filter Order",
+        false
+    ));
     return layout;
 }
 
@@ -319,9 +347,9 @@ Coefficients LearningBiquadAudioProcessor::calculateHPF(double frequency)
 Coefficients LearningBiquadAudioProcessor::calculateBPF(double frequency)
 {
     Coefficients bpf;
-    auto omega = juce::MathConstants<double>::twoPi * (frequency / getSampleRate());
-    auto sin_omega = std::sin(omega);
-    auto cos_omega = std::cos(omega);
+    // auto omega = juce::MathConstants<double>::twoPi * (frequency / getSampleRate());
+    // auto sin_omega = std::sin(omega);
+    // auto cos_omega = std::cos(omega);
     
     bpf.a0 = 1.0; // RESET
     

@@ -3,6 +3,12 @@
 
 #include <juce_audio_processors/juce_audio_processors.h>
 
+enum FilterOrder
+{
+    OnePole = 1,
+    TwoPole
+};
+
 struct Coefficients
 {
     double a0{0.0}, a1{0.0}, a2{0.0}, b1{0.0}, b2{0.0};
